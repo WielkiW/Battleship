@@ -12,4 +12,20 @@ def creat_game_board(dimension):
     return game_board
 
 
-print(creat_game_board(5))
+def print_game_board(dimension):
+    print('')
+    game_board = creat_game_board(dimension)
+    i = 1
+    while i <= dimension-1:
+        print(' ', i, end='')
+        i += 1
+    print(' ', dimension)
+    for i, element in zip(range(65, 66+dimension), game_board):
+        print(chr(i), end=' ')
+        for j in element:
+            print(j, end='  ')
+        print('')
+    print('')
+
+
+print_game_board(5)
