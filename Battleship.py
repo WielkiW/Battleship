@@ -42,7 +42,6 @@ def print_game_board(game_board, dimension):
 
 
 def change_coords_to_corect(move):
-
     if len(move) != 2:
         return False
     move = move.lower()
@@ -89,7 +88,6 @@ def place_ships_2_blocks(board_for_player, dimension, ship_number):
     while ship_meter_for_2_block < ship_number:
 
         print_game_board(board_for_player, dimension)
-
         coords = input("Podaj koordynaty swojego statku 2 blockowego: ")
         if change_coords_to_corect(coords) == False:
             print("Podano złą składnie koordynatów")
@@ -97,25 +95,20 @@ def place_ships_2_blocks(board_for_player, dimension, ship_number):
             coords = change_coords_to_corect(coords)
             if board_for_player[coords[0]][coords[1]] == "X":
                 print("Już wybierałeś te koordynaty")
-
             elif is_collision(board_for_player, dimension, coords):
-                board_for_player[coords[0]][coords[1]] = "X"
-
                 plecement_direction = input(
                     "Podaj kierunek statku 2 blockowego: (horizontal/vertical) [H/V]")
-
                 if plecement_direction.lower() == "v" and (coords[0] + 1 < dimension or coords[0] - 1 >= 0):
-                    if coords[0] + 1 < dimension:
+                    if coords[0] + 1 < dimension and is_collision(board_for_player, dimension, (coords[0] + 1, coords[1])):
                         board_for_player[coords[0]+1][coords[1]] = "X"
-                    else:
+                    elif is_collision(board_for_player, dimension, (coords[0] - 1, coords[1])):
                         board_for_player[coords[0]-1][coords[1]] = "X"
-
                 elif plecement_direction.lower() == "h" and (coords[1] + 1 <= dimension or coords[1] - 1 >= 0):
-                    if coords[1] + 1 < dimension:
+                    if coords[1] + 1 < dimension and is_collision(board_for_player, dimension, (coords[0], coords[1]+1)):
                         board_for_player[coords[0]][coords[1]+1] = "X"
-                    else:
+                    elif is_collision(board_for_player, dimension, (coords[0], coords[1]-1)):
                         board_for_player[coords[0]][coords[1]-1] = "X"
-
+                board_for_player[coords[0]][coords[1]] = "X"
                 ship_meter_for_2_block += 1
             else:
                 print("Nastąpiła kolizja wybierz inne miejsce swojego statku")
@@ -134,8 +127,9 @@ def place_ships_1_block(board_for_player, dimension, ship_number):
         coords = input("Podaj koordynaty swojego statku 1 blockowego: ")
         if change_coords_to_corect(coords) == False:
             print("Podano złą składnie koordynatów")
-        elif is_collision(board_for_player, dimension, coords):
+        else:
             coords = change_coords_to_corect(coords)
+        if is_collision(board_for_player, dimension, coords):
             if board_for_player[coords[0]][coords[1]] == "X":
                 print("Już wybierałeś te koordynaty")
             else:
