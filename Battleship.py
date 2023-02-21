@@ -66,75 +66,20 @@ def change_coords_to_corect(move):
 
 
 def is_collision(board_for_player, dimension, coords):
-
     row = coords[0]
     column = coords[1]
-    funcs = (row-1, column),  (row, column +
-                               1), (row+1, column), (row, column-1)
+    funcs = [(row-1, column),
+             (row, column + 1),
+             (row+1, column),
+             (row, column-1)]
     neighbours = []
     for func in funcs:
         if dimension > func[0] >= 0 and dimension > func[1] >= 0:
             neighbours.append([func[0], func[1]])
     for elements in neighbours:
-        if board_for_player[elements[0]][elements[0]] == 'X':
+        if board_for_player[elements[0]][elements[1]] == 'X':
             return False
-        else:
-            return True
-
-    #         if board_for_player[row+1][column] == "X":
-    #             return False
-
-    #     try:
-    #         board_for_player[row+1][column]
-
-    #         if board_for_player[row+1][column] == "X":
-    #             return False
-    #         elif board_for_player[row][column+1] == "X":
-    #             return False
-    #         elif board_for_player[row][column-1] == "X":
-    #             return False
-    #         else:
-    #             return True
-    #     except IndexError:
-    #         pass
-    # elif (row+1) > dimension:
-    #     if board_for_player[row-1][column] == "X":
-    #         return False
-    #     elif board_for_player[row][column+1] == "X":
-    #         return False
-    #     elif board_for_player[row][column-1] == "X":
-    #         return False
-    #     else:
-    #         return True
-    # elif (column-1) < 0:
-    #     if board_for_player[row+1][column] == "X":
-    #         return False
-    #     elif board_for_player[row-1][column] == "X":
-    #         return False
-    #     elif board_for_player[row][column+1] == "X":
-    #         return False
-    #     else:
-    #         return True
-    # elif (column+1) > dimension:
-    #     if board_for_player[row+1][column] == "X":
-    #         return False
-    #     elif board_for_player[row-1][column] == "X":
-    #         return False
-    #     elif board_for_player[row][column-1] == "X":
-    #         return False
-    #     else:
-    #         return True
-    # else:
-    #     if board_for_player[row-1][column] == "X":
-    #         return False
-    #     if board_for_player[row+1][column] == "X":
-    #         return False
-    #     elif board_for_player[row-1][column] == "X":
-    #         return False
-    #     elif board_for_player[row][column-1] == "X":
-    #         return False
-    #     else:
-    #         return True
+    return True
 
 
 def place_ships_2_blocks(board_for_player, dimension, ship_number):
