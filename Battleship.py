@@ -1,12 +1,14 @@
 import sys
 from os import system, name
 
+
 def clear():
- 
-    if name=='nt':
+
+    if name == 'nt':
         _ = system('cls')
     else:
         _ = system('clear')
+
 
 def creat_game_board(dimension):
     game_board = []
@@ -24,7 +26,7 @@ def creat_game_board(dimension):
     return game_board
 
 
-def print_game_board(game_board,dimension):
+def print_game_board(game_board, dimension):
     print('')
     i = 1
     while i <= dimension-1:
@@ -38,9 +40,10 @@ def print_game_board(game_board,dimension):
         print('')
     print('')
 
+
 def change_coords_to_corect(move):
 
-    if len(move) != 2: 
+    if len(move) != 2:
         return False
     move = move.lower()
     if move[0] in ["a", "b", "c", "d", "e"] and move[1] in ["1", "2", "3", "4", "5"]:
@@ -58,64 +61,84 @@ def change_coords_to_corect(move):
         move = move.replace("d", "4")
         move = move.replace("e", "5")
         return [int(move[0])-1, int(move[1])-1]
-    else: 
+    else:
         return False
+
 
 def is_collision(board_for_player, dimension, coords):
 
     row = coords[0]
     column = coords[1]
+    funcs = (row-1, column),  (row, column +
+                               1), (row+1, column), (row, column-1)
+    neighbours = []
+    for func in funcs:
+        if dimension > func[0] >= 0 and dimension > func[1] >= 0:
+            neighbours.append([func[0], func[1]])
+    for elements in neighbours:
+        if board_for_player[elements[0]][elements[0]] == 'X':
+            return False
+        else:
+            return True
 
-    if (row-1) < 0:
-        if board_for_player[row+1][column] == "X":
-            return False
-        elif board_for_player[row][column+1] == "X":
-            return False
-        elif board_for_player[row][column-1] == "X":
-            return False
-        else:
-            return True
-    elif (row+1) > dimension:
-        if board_for_player[row-1][column] == "X":
-            return False
-        elif board_for_player[row][column+1] == "X":
-            return False
-        elif board_for_player[row][column-1] == "X":
-            return False
-        else:
-            return True
-    elif (column-1) < 0:
-        if board_for_player[row+1][column] == "X":
-            return False
-        elif board_for_player[row-1][column] == "X":
-            return False
-        elif board_for_player[row][column+1] == "X":
-            return False
-        else:
-            return True
-    elif (column+1) > dimension:
-        if board_for_player[row+1][column] == "X":
-            return False
-        elif board_for_player[row-1][column] == "X":
-            return False
-        elif board_for_player[row][column-1] == "X":
-            return False
-        else:
-            return True
-    else:
-        if board_for_player[row-1][column] == "X":
-            return False
-        if board_for_player[row+1][column] == "X":
-            return False
-        elif board_for_player[row-1][column] == "X":
-            return False
-        elif board_for_player[row][column-1] == "X":
-            return False
-        else:
-            return True
+    #         if board_for_player[row+1][column] == "X":
+    #             return False
+
+    #     try:
+    #         board_for_player[row+1][column]
+
+    #         if board_for_player[row+1][column] == "X":
+    #             return False
+    #         elif board_for_player[row][column+1] == "X":
+    #             return False
+    #         elif board_for_player[row][column-1] == "X":
+    #             return False
+    #         else:
+    #             return True
+    #     except IndexError:
+    #         pass
+    # elif (row+1) > dimension:
+    #     if board_for_player[row-1][column] == "X":
+    #         return False
+    #     elif board_for_player[row][column+1] == "X":
+    #         return False
+    #     elif board_for_player[row][column-1] == "X":
+    #         return False
+    #     else:
+    #         return True
+    # elif (column-1) < 0:
+    #     if board_for_player[row+1][column] == "X":
+    #         return False
+    #     elif board_for_player[row-1][column] == "X":
+    #         return False
+    #     elif board_for_player[row][column+1] == "X":
+    #         return False
+    #     else:
+    #         return True
+    # elif (column+1) > dimension:
+    #     if board_for_player[row+1][column] == "X":
+    #         return False
+    #     elif board_for_player[row-1][column] == "X":
+    #         return False
+    #     elif board_for_player[row][column-1] == "X":
+    #         return False
+    #     else:
+    #         return True
+    # else:
+    #     if board_for_player[row-1][column] == "X":
+    #         return False
+    #     if board_for_player[row+1][column] == "X":
+    #         return False
+    #     elif board_for_player[row-1][column] == "X":
+    #         return False
+    #     elif board_for_player[row][column-1] == "X":
+    #         return False
+    #     else:
+    #         return True
+
 
 def place_ships_2_blocks(board_for_player, dimension, ship_number):
-    
+
     ship_meter_for_2_block = 0
 
     while ship_meter_for_2_block < ship_number:
@@ -128,30 +151,32 @@ def place_ships_2_blocks(board_for_player, dimension, ship_number):
         else:
             coords = change_coords_to_corect(coords)
             if board_for_player[coords[0]][coords[1]] == "X":
-                    print("Już wybierałeś te koordynaty")
-            
+                print("Już wybierałeś te koordynaty")
+
             elif is_collision(board_for_player, dimension, coords):
                 board_for_player[coords[0]][coords[1]] = "X"
 
-                plecement_direction = input("Podaj kierunek statku 2 blockowego: (horizontal/vertical) [H/V]")
-    
+                plecement_direction = input(
+                    "Podaj kierunek statku 2 blockowego: (horizontal/vertical) [H/V]")
+
                 if plecement_direction.lower() == "v" and (coords[0] + 1 < dimension or coords[0] - 1 >= 0):
                     if coords[0] + 1 < dimension:
-                        board_for_player [coords[0]+1] [coords[1]] = "X"
+                        board_for_player[coords[0]+1][coords[1]] = "X"
                     else:
-                        board_for_player [coords[0]-1] [coords[1]] = "X"
+                        board_for_player[coords[0]-1][coords[1]] = "X"
 
                 elif plecement_direction.lower() == "h" and (coords[1] + 1 <= dimension or coords[1] - 1 >= 0):
                     if coords[1] + 1 < dimension:
-                        board_for_player [coords[0]] [coords[1]+1] = "X"
+                        board_for_player[coords[0]][coords[1]+1] = "X"
                     else:
-                        board_for_player [coords[0]] [coords[1]-1] = "X"
+                        board_for_player[coords[0]][coords[1]-1] = "X"
 
                 ship_meter_for_2_block += 1
             else:
                 print("Nastąpiła kolizja wybierz inne miejsce swojego statku")
 
     return board_for_player
+
 
 def place_ships_1_block(board_for_player, dimension, ship_number):
 
@@ -167,7 +192,7 @@ def place_ships_1_block(board_for_player, dimension, ship_number):
         elif is_collision(board_for_player, dimension, coords):
             coords = change_coords_to_corect(coords)
             if board_for_player[coords[0]][coords[1]] == "X":
-                    print("Już wybierałeś te koordynaty")
+                print("Już wybierałeś te koordynaty")
             else:
                 board_for_player[coords[0]][coords[1]] = "X"
                 ship_meter_for_1_block += 1
@@ -176,21 +201,26 @@ def place_ships_1_block(board_for_player, dimension, ship_number):
 
     return board_for_player
 
+
 def create_board_for_player_1(dimension, ship_number):
 
     board_for_player = creat_game_board(dimension)
 
-    board_for_player = place_ships_2_blocks(board_for_player, dimension, ship_number/2)
+    board_for_player = place_ships_2_blocks(
+        board_for_player, dimension, ship_number/2)
 
-    board_for_player = place_ships_1_block(board_for_player, dimension, ship_number)
+    board_for_player = place_ships_1_block(
+        board_for_player, dimension, ship_number)
 
-    return[board_for_player]
+    return [board_for_player]
+
 
 def create_board_for_player_2():
 
     clear()
 
-    return[1,2,3,4,5,6]
+    return [1, 2, 3, 4, 5, 6]
+
 
 def menu_battleship():
 
@@ -216,11 +246,13 @@ def menu_battleship():
         if menu_operation == 1:
             return [board_for_player_1, board_for_player_2]
         elif menu_operation == 2:
-            board_for_player_1 = create_board_for_player_1(dimension, ship_number)
+            board_for_player_1 = create_board_for_player_1(
+                dimension, ship_number)
         elif menu_operation == 3:
             board_for_player_2 = create_board_for_player_2(dimension)
 
     print("Dziękujemy za grę.")
     sys.exit(0)
+
 
 menu_battleship()
