@@ -1,4 +1,5 @@
 import sys
+import re
 from os import system, name
 
 
@@ -39,6 +40,13 @@ def print_game_board(game_board, dimension):
             print(j, end='  ')
         print('')
     print('')
+
+
+def creat_move_dictionary(dimension):
+    move_dictionary = {}
+    for i in range(dimension):
+        move_dictionary[chr(65+i)] = i
+    return move_dictionary
 
 
 def change_coords_to_corect(move):
