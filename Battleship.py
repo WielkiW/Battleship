@@ -51,10 +51,10 @@ def creat_move_dictionary(dimension):
 
 def change_coords_to_corect(move, dimension):
     dictionary = creat_move_dictionary(dimension)
-    if len(move) != 2:
-        return False
     move = re.split('(\d+)', move.upper())
     move.remove('')
+    if len(move) != 2:
+        return False
     try:
         int(move[0])
     except:
@@ -169,7 +169,7 @@ def create_board_for_player_2():
 def menu_battleship():
 
     menu_operation = 0
-    dimension = 5
+    dimension = 10
     ship_number = 4
 
     board_for_player_1 = []
