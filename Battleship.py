@@ -1,14 +1,14 @@
 import sys
 import re
-import re
+
 from os import system, name
+import time
 
 
 def clear():
 
     if name == 'nt':
 
-    if name == 'nt':
         _ = system('cls')
     else:
         _ = system('clear')
@@ -38,11 +38,11 @@ def creat_move_dictionary(dimension):
 
 
 def change_coords_to_corect(move, dimension):
+    if len(move) != 2:
+        return False
     dictionary = creat_move_dictionary(dimension)
     move = re.split('(\d+)', move.upper())
     move.remove('')
-    if len(move) != 2:
-        return False
     try:
         int(move[0])
     except:
@@ -55,6 +55,23 @@ def change_coords_to_corect(move, dimension):
             return (dictionary[move[1]], int(move[0])-1)
         else:
             return False
+
+
+def if_neighbour_shot(board_for_player, dimension, coords):
+    row = coords[0]
+    column = coords[1]
+    funcs = [(row-1, column),
+             (row, column + 1),
+             (row+1, column),
+             (row, column-1)]
+    neighbours = []
+    for func in funcs:
+        if dimension > func[0] >= 0 and dimension > func[1] >= 0:
+            neighbours.append([func[0], func[1]])
+    for elements in neighbours:
+        if board_for_player[elements[0]][elements[1]] == 'H':
+            return [elements[0], elements[1]]
+    return False
 
 
 def is_collision(board_for_player, dimension, coords):
@@ -143,7 +160,9 @@ def ship_harbour(dimension):
 
 def place_ships(board_for_player, dimension):
     harbour = ship_harbour(dimension)
+    # list_of_coords = []
     for ship in harbour:
+        # list_of_ship = []
         ship_number = ship['number']
         while ship_number > 0:
             ship_placment = []
@@ -179,6 +198,7 @@ def place_ships(board_for_player, dimension):
                                 ship_number -= 1
                                 for block in ship_placment:
                                     board_for_player[block[0]][block[1]] = 'X'
+                                    # list_of_ship.append[block[0]][block[1]]
                             else:
                                 print('Invalid move')
 
@@ -235,7 +255,7 @@ def create_board_for_player_2(dimension):
     return board_for_player
 
 
-def change_board(board, coord_x, coord_y, sign):
+def change_board(board, coord_y, coord_x, sign):
     board[coord_y][coord_x] = sign
     return board
 
@@ -299,7 +319,7 @@ def game_dev():
 
     while value_win_player_1 != value_to_win or value_win_player_2 != value_to_win:
 
-        # clear()
+        clear()
 
         print("Twoje statki:")
         print_game_board(board_for_player_1, dimension)
@@ -313,14 +333,42 @@ def game_dev():
         if board_for_player_2[shoot_coords[0]][shoot_coords[1]] == "X":
             game_board_player_1 = change_board(
                 game_board_player_1, shoot_coords[0], shoot_coords[1], "H")
+            if is_collision(board_for_player_2, dimension, shoot_coords):
+                game_board_player_1 = change_board(
+                    game_board_player_1, shoot_coords[0], shoot_coords[1], "S")
+            else:
+                neighbour_coords = if_neighbour_shot(
+                    game_board_player_1, dimension, shoot_coords)
+                if neighbour_coords != False:
+                    game_board_player_1 = change_board(
+                        game_board_player_1, neighbour_coords[0], neighbour_coords[1], "S")
+                    game_board_player_1 = change_board(
+                        game_board_player_1, shoot_coords[0], shoot_coords[1], "S")
+
+            clear()
+
+            print("Twoje statki:")
+            print_game_board(board_for_player_1, dimension)
+            print("Twoje strzały:")
+            print_game_board(game_board_player_1, dimension)
             print("Strzał trafiony")
+            time.sleep(5)
             value_win_player_1 += 1
+            if value_win_player_1 == value_to_win:
+                break
         elif board_for_player_2[shoot_coords[0]][shoot_coords[1]] == "0":
             game_board_player_1 = change_board(
                 game_board_player_1, shoot_coords[0], shoot_coords[1], "M")
-            print("Strzał nietrafiony")
+            clear()
 
-        # clear()
+            print("Twoje statki:")
+            print_game_board(board_for_player_1, dimension)
+            print("Twoje strzały:")
+            print_game_board(game_board_player_1, dimension)
+            print("Strzał nietrafiony")
+            time.sleep(5)
+
+        clear()
 
         print("Twoje statki:")
         print_game_board(board_for_player_2, dimension)
@@ -334,12 +382,41 @@ def game_dev():
         if board_for_player_1[shoot_coords[0]][shoot_coords[1]] == "X":
             game_board_player_2 = change_board(
                 game_board_player_2, shoot_coords[0], shoot_coords[1], "H")
+            if is_collision(board_for_player_1, dimension, shoot_coords):
+                game_board_player_2 = change_board(
+                    game_board_player_2, shoot_coords[0], shoot_coords[1], "S")
+            else:
+                neighbour_coords = if_neighbour_shot(
+                    game_board_player_2, dimension, shoot_coords)
+                if neighbour_coords != False:
+                    game_board_player_2 = change_board(
+                        game_board_player_2, neighbour_coords[0], neighbour_coords[1], "S")
+                    game_board_player_2 = change_board(
+                        game_board_player_2, shoot_coords[0], shoot_coords[1], "S")
             value_win_player_2 += 1
+            clear()
+            print("Twoje statki:")
+            print_game_board(board_for_player_1, dimension)
+            print("Twoje strzały:")
+            print_game_board(game_board_player_1, dimension)
+            if value_win_player_2 == value_to_win:
+                break
             print("Strzał trafiony")
+            time.sleep(5)
         elif board_for_player_1[shoot_coords[0]][shoot_coords[1]] == "0":
             game_board_player_2 = change_board(
                 game_board_player_2, shoot_coords[0], shoot_coords[1], "M")
+            clear()
+            print("Twoje statki:")
+            print_game_board(board_for_player_1, dimension)
+            print("Twoje strzały:")
+            print_game_board(game_board_player_1, dimension)
             print("Strzał nietrafiony")
+            time.sleep(5)
+    if value_win_player_1 == value_to_win:
+        print("Player 2 is a gdmn looser")
+    else:
+        print("Fck ya player 1")
 
 
 game_dev()
