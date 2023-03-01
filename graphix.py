@@ -1,3 +1,7 @@
+
+from os import system, name
+
+
 def title():
     print("\n" +
           "   ██████╗  █████╗ ████████╗████████╗██╗     ███████╗███████╗██╗  ██╗██╗██████╗ \n" +
@@ -22,3 +26,12 @@ def ship_graphic():
           "    ~~^^      ~^^~     ~^~ ~^ ~^\n"
           "        ~^~~        ~~~^^~\n" +
           "\n")
+
+
+def clear():
+
+    if name == 'nt':
+
+        _ = system('cls')
+    else:
+        _ = system('clear')

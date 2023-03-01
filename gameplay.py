@@ -1,19 +1,40 @@
 import re
-from os import system, name
 import game_board
+import time
 
 
-def clear():
-
-    if name == 'nt':
-
-        _ = system('cls')
-    else:
-        _ = system('clear')
+def shoot(oponent_fleet, player_board, oponent_board, value_to_win, dimension):
+    shoot_coords = input("Podaj koordynaty do stzały: ")
+    shoot_coords = change_coords_to_corect(shoot_coords, dimension)
+    for i in range(len(oponent_fleet)):
+        new_cord = []
+        for item in oponent_fleet[i]['status']:
+            if item[0] == shoot_coords[0] and item[1] == shoot_coords[1]:
+                player_board = game_board.change_board(
+                    player_board, shoot_coords[0], shoot_coords[1], "H")
+                item = 'H'
+                value_to_win += 1
+                print("Trafiony")
+                time.sleep(3)
+            elif oponent_board[shoot_coords[0]][shoot_coords[1]] == 0:
+                player_board = game_board.change_board(
+                    player_board, shoot_coords[0], shoot_coords[1], "M")
+                print("Pydło")
+                time.sleep(3)
+            new_cord.append(item)
+        oponent_fleet[i]['status'] = new_cord
+        for i in range(len(oponent_fleet)):
+            if all(element == 'H' for element in oponent_fleet[i]['status']):
+                for coordinates in oponent_fleet[i]['coords']:
+                    player_board = game_board.change_board(
+                        player_board, coordinates[0], coordinates[1], "S")
+                print("Trafiony zatopiony")
+                time.sleep(5)
+    return value_to_win
 
 
 def change_coords_to_corect(move, dimension):
-    if len(move) != 2:
+    if len(move) < 2:
         return False
     dictionary = game_board.creat_move_dictionary(dimension)
     move = re.split('(\d+)', move.upper())
@@ -30,23 +51,6 @@ def change_coords_to_corect(move, dimension):
             return (dictionary[move[1]], int(move[0])-1)
         else:
             return False
-
-
-def if_neighbour_shot(board_for_player, dimension, coords):
-    row = coords[0]
-    column = coords[1]
-    funcs = [(row-1, column),
-             (row, column + 1),
-             (row+1, column),
-             (row, column-1)]
-    neighbours = []
-    for func in funcs:
-        if dimension > func[0] >= 0 and dimension > func[1] >= 0:
-            neighbours.append([func[0], func[1]])
-    for elements in neighbours:
-        if board_for_player[elements[0]][elements[1]] == 'H':
-            return [elements[0], elements[1]]
-    return False
 
 
 def is_collision(board_for_player, dimension, coords):
@@ -84,32 +88,48 @@ def place_ships(board_for_player, dimension):
                 if board_for_player[coords[0]][coords[1]] == "X":
                     print("Już wybierałeś te koordynaty")
                 elif is_collision(board_for_player, dimension, coords):
-                    ship_placment.append([coords[0], coords[1]])
+
                     if ship['size'] > 1:
                         plecement_direction = input(
                             "Podaj kierunek statku 2 blockowego: (horizontal/vertical) [H/V]")
-                        if plecement_direction.lower() == "v":
-                            if coords[0] + ship['size'] - 1 < dimension:
-                                for i in range(1, ship['size']):
-                                    ship_placment.append(
-                                        [coords[0] + i, coords[1]])
-                            else:
-                                for i in range(1, ship['size']):
-                                    ship_placment.append(
-                                        [coords[0] - i, coords[1]])
-                        if plecement_direction.lower() == "h":
-                            if coords[1] + ship['size'] - 1 < dimension:
-                                for i in range(1, ship['size']):
-                                    ship_placment.append(
-                                        [coords[0], coords[1]+i])
-                            else:
-                                for i in range(1, ship['size']):
-                                    ship_placment.append(
-                                        [coords[0], coords[1]-i])
-                    check = []
-                    for block in ship_placment:
-                        check.append(is_collision(
-                            board_for_player, dimension, block))
+                        match plecement_direction.lower():
+                            case "v":
+                                ship_placment.append([coords[0], coords[1]])
+                                if coords[0] + ship['size'] - 1 < dimension:
+                                    for i in range(1, ship['size']):
+                                        ship_placment.append(
+                                            [coords[0] + i, coords[1]])
+                                else:
+
+                                    for i in range(1, ship['size']):
+                                        ship_placment.append(
+                                            [coords[0] - i, coords[1]])
+                                check = []
+                                for block in ship_placment:
+                                    check.append(is_collision(
+                                        board_for_player, dimension, block))
+                            case "h":
+                                ship_placment.append([coords[0], coords[1]])
+                                if coords[1] + ship['size'] - 1 < dimension:
+                                    for i in range(1, ship['size']):
+                                        ship_placment.append(
+                                            [coords[0], coords[1]+i])
+                                else:
+                                    for i in range(1, ship['size']):
+                                        ship_placment.append(
+                                            [coords[0], coords[1]-i])
+                                check = []
+                                for block in ship_placment:
+                                    check.append(is_collision(
+                                        board_for_player, dimension, block))
+                            case _:
+                                check = [False]
+                    else:
+                        ship_placment.append([coords[0], coords[1]])
+                        check = []
+                        for block in ship_placment:
+                            check.append(is_collision(
+                                board_for_player, dimension, block))
                     if all(check):
                         ship_number -= 1
                         for block in ship_placment:
@@ -126,11 +146,6 @@ def place_ships(board_for_player, dimension):
 
 
 def create_board_for_player(dimension):
-
-    clear()
-
     board_for_player = game_board.creat_game_board(dimension)
-
     board_for_player, fleet = place_ships(board_for_player, dimension)
-
     return board_for_player, fleet
