@@ -3,7 +3,8 @@ import gameplay
 import game_board
 
 
-def enemy_ai(dimension, player_board, ai_board, player_fleet, value_to_win_ai):
+def enemy_ai(dimension, player_board, ai_board, player_fleet, win):
+    value_to_win_ai = win
     shoot = 0
     next_shot = []
     if next_shot == []:
@@ -11,10 +12,12 @@ def enemy_ai(dimension, player_board, ai_board, player_fleet, value_to_win_ai):
             row = random.randint(0, dimension-1)
             column = random.randint(0, dimension-1)
             if ai_board[row][column] == 0:
+                print(row, column)
                 shoot = 1
                 value_to_win_ai = gameplay.shoot(
-                    player_fleet, ai_board, player_board, value_to_win_ai, [row, column])
+                    player_fleet, ai_board, player_board, win, [row, column])
             if player_board[row][column] == 'H':
+                print(row, column)
                 to_check = [[row+1, column], [row-1, column],
                             [row, column-1], [row, column+1]]
                 for item in to_check:
@@ -36,6 +39,7 @@ def enemy_ai(dimension, player_board, ai_board, player_fleet, value_to_win_ai):
                 next_shot.clear()
             else:
                 next_shot.pop(0)
+    return value_to_win_ai
 
 
 def random_ship_placment(dimension, ai_board):
@@ -47,15 +51,17 @@ def random_ship_placment(dimension, ai_board):
             ship_placment = []
             name = ship['name']
             placment = 0
+            check = []
             while placment == 0:
                 row = random.randint(0, dimension-1)
                 column = random.randint(0, dimension-1)
                 if ai_board[row][column] == 0:
                     placment = 1
                     if ship['size'] > 1:
-                        placment_direction = random.choice('h', 'v')
+                        ship_direction = ['h', 'v']
+                        placment_direction = random.choice(ship_direction)
                         check = gameplay.ship_direction(placment_direction, ship_placment, ship, dimension, [
-                            row, column], ai_board)
+                            row, column], ai_board, check)
                     else:
                         ship_placment.append([row, column])
                         check = []
@@ -66,7 +72,7 @@ def random_ship_placment(dimension, ai_board):
                         ship_number -= 1
                         for block in ship_placment:
                             ai_board[block[0]][block[1]] = 'X'
-            ai_fleet.append(
-                {'name': name, 'coords': ship_placment, 'status': ship_placment})
+                        ai_fleet.append(
+                            {'name': name, 'coords': ship_placment, 'status': ship_placment})
 
     return ai_board, ai_fleet

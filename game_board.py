@@ -91,3 +91,7 @@ def shots_to_win(dimension):
             return (20)
         case _:
             return 'Invalid value'
+
+
+board = creat_game_board(10)
+print_game_board(board, 10)
