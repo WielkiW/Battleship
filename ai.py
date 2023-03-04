@@ -3,11 +3,10 @@ import gameplay
 import game_board
 
 
-def enemy_ai(dimension, player_board, ai_board, player_fleet, win):
+def enemy_ai(dimension, player_board, ai_board, player_fleet, win, next_shoot, previous_shoot):
     value_to_win_ai = win
     shoot = 0
-    next_shot = []
-    if next_shot == []:
+    if next_shoot == []:
         while shoot == 0:
             row = random.randint(0, dimension-1)
             column = random.randint(0, dimension-1)
@@ -15,31 +14,57 @@ def enemy_ai(dimension, player_board, ai_board, player_fleet, win):
                 print(row, column)
                 shoot = 1
                 value_to_win_ai = gameplay.shoot(
-                    player_fleet, ai_board, player_board, win, [row, column])
+                    player_fleet, ai_board, player_board, value_to_win_ai, [row, column])
             if player_board[row][column] == 'H':
                 print(row, column)
-                to_check = [[row+1, column], [row-1, column],
-                            [row, column-1], [row, column+1]]
-                for item in to_check:
-                    if ai_board[item[0]][item[1]] == 0:
-                        next_shot.append(item)
-                previous_shot = [[row][column]]
+            previous_shoot = [row, column]
     else:
-        shoot_coordinates = next_shot[0]
+        shoot_coordinates = next_shoot[0]
+        print(shoot_coordinates)
         value_to_win_ai = gameplay.shoot(
             player_fleet, ai_board, player_board, value_to_win_ai, shoot_coordinates)
-        if player_board[shoot_coordinates[0]][shoot_coordinates[1]] == 'H':
-            if previous_shot[0] == shoot_coordinates[0]:
-                next_shot.clear()
-                next_shot.append([previous_shot[0]-1, shoot_coordinates[1]])
-                next_shot.append([previous_shot[0]-2, shoot_coordinates[1]])
-                next_shot.append([previous_shot[0]+1, shoot_coordinates[1]])
-                next_shot.append([previous_shot[0]+2, shoot_coordinates[1]])
-            elif player_board[shoot_coordinates[0]][shoot_coordinates[1]] == 'S':
-                next_shot.clear()
-            else:
-                next_shot.pop(0)
-    return value_to_win_ai
+
+    return value_to_win_ai, previous_shoot
+
+
+def check_for_next_shot(previous_shoot, ai_board, dimension, next_shoot):
+    if ai_board[previous_shoot[0]][previous_shoot[1]] == 'H':
+        rows_to_check = [previous_shoot[0]+1, previous_shoot[0]-1]
+        columns_to_check = [previous_shoot[1]-1, previous_shoot[1]+1]
+        for row in rows_to_check:
+            if 0 <= row <= dimension-1 and ai_board[row][previous_shoot[1]] == 0:
+                next_shoot.append([row, previous_shoot[1]])
+        for column in columns_to_check:
+            if 0 <= column <= dimension-1:
+                next_shoot.append([previous_shoot[0], column])
+    elif ai_board[previous_shoot[0]][previous_shoot[1]] == 'S':
+        next_shoot.clear()
+
+    return next_shoot
+
+
+def check_line(ai_board, previous_shoot, next_shoot, dimension):
+    if ai_board[previous_shoot[0]][previous_shoot[1]] == 'H':
+        if 0 <= previous_shoot[0]+1 <= dimension or 0 <= previous_shoot[0]-1 <= dimension:
+            if ai_board[previous_shoot[0]+1][previous_shoot[1]] == 'H' or ai_board[previous_shoot[0]-1][previous_shoot[1]] == 'H':
+                next_shoot.clear()
+                rows_to_check = [previous_shoot[0],
+                                 previous_shoot[0]+1, previous_shoot[0]-1, previous_shoot[0]+2,  previous_shoot[0]-2]
+                for row in rows_to_check:
+                    if 0 <= row <= dimension - 1 and ai_board[row][previous_shoot[1]] == 0:
+                        next_shoot.append([row, previous_shoot[1]])
+        elif 0 <= previous_shoot[1]+1 <= dimension or 0 <= previous_shoot[1]-1 <= dimension:
+            if ai_board[previous_shoot[0]][previous_shoot[1]+1] == 'H' or ai_board[previous_shoot[0]][previous_shoot[1]-1] == 'H':
+                next_shoot.clear()
+                columns_to_check = [previous_shoot[1], previous_shoot[1]+1,
+                                    previous_shoot[1]-1, previous_shoot[1]+2, previous_shoot[1]-2]
+                for column in columns_to_check and ai_board[previous_shoot[0]][column]:
+                    if 0 <= row <= dimension - 1:
+                        next_shoot.append([previous_shoot[0], column])
+        next_shoot.pop(0)
+    else:
+        pass
+    return next_shoot
 
 
 def random_ship_placment(dimension, ai_board):

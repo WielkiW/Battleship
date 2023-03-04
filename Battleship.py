@@ -31,7 +31,7 @@ def game_dev(dimension, boards_fleets):
     value_win_player_1 = 0
     value_win_player_2 = 0
 
-    while value_win_player_1 != value_to_win or value_win_player_2 != value_to_win:
+    while value_win_player_1 != value_to_win and value_win_player_2 != value_to_win:
 
         graphix.clear()
         print('Player 1')
@@ -44,6 +44,8 @@ def game_dev(dimension, boards_fleets):
             shoot_coords1 = input("Podaj koordynaty do stzału: ")
             shoot_coords1 = gameplay.change_coords_to_corect(
                 shoot_coords1, dimension)
+            if shoot_coords1 != False and game_board_player_1[shoot_coords1[0]][shoot_coords1[1]] != 0:
+                shoot_coords1 = False
         value_win_player_1 = gameplay.shoot(fleet_for_player2, game_board_player_1,
                                             board_for_player_2, value_win_player_1,  shoot_coords1)
         if value_win_player_1 == value_to_win:
@@ -60,6 +62,8 @@ def game_dev(dimension, boards_fleets):
             shoot_coords2 = input("Podaj koordynaty do stzały: ")
             shoot_coords2 = gameplay.change_coords_to_corect(
                 shoot_coords2, dimension)
+            if shoot_coords2 != False and game_board_player_2[shoot_coords2[0]][shoot_coords2[1]] != 0:
+                shoot_coords2 = False
         value_win_player_2 = gameplay.shoot(fleet_for_player1, game_board_player_2,
                                             board_for_player_1, value_win_player_2,  shoot_coords2)
 
@@ -83,8 +87,10 @@ def player_vs_cpu(dimension, boards_fleets):
 
     value_win_player_1 = 0
     value_win_ai = 0
+    previous_shoot = []
+    next_shoot = []
 
-    while value_win_player_1 != value_to_win or value_win_ai != value_to_win:
+    while value_win_player_1 != value_to_win and value_win_ai != value_to_win:
 
         graphix.clear()
         print('Player 1')
@@ -92,9 +98,13 @@ def player_vs_cpu(dimension, boards_fleets):
         game_board.print_game_board(board_for_player_1, dimension)
         print("Twoje strzały:")
         game_board.print_game_board(game_board_player_1, dimension)
-        shoot_coords1 = input("Podaj koordynaty do stzały: ")
-        shoot_coords1 = gameplay.change_coords_to_corect(
-            shoot_coords1, dimension)
+        shoot_coords1 = False
+        while shoot_coords1 == False:
+            shoot_coords1 = input("Podaj koordynaty do stzały: ")
+            shoot_coords1 = gameplay.change_coords_to_corect(
+                shoot_coords1, dimension)
+            if shoot_coords1 != False and game_board_player_1[shoot_coords1[0]][shoot_coords1[1]] != 0:
+                shoot_coords1 = False
         value_win_player_1 = gameplay.shoot(fleet_ai, game_board_player_1,
                                             board_for_ai, value_win_player_1, shoot_coords1)
         if value_win_player_1 == value_to_win:
@@ -107,14 +117,18 @@ def player_vs_cpu(dimension, boards_fleets):
         print("Strzały CPU:")
         game_board.print_game_board(game_board_ai, dimension)
         time.sleep(3)
-        value_win_ai = ai.enemy_ai(
-            dimension, board_for_player_1, game_board_ai, fleet_for_player1, value_win_ai)
+        value_win_ai, previous_shoot = ai.enemy_ai(
+            dimension, board_for_player_1, game_board_ai, fleet_for_player1, value_win_ai, next_shoot, previous_shoot)
         time.sleep(3)
+        next_shoot = ai.check_for_next_shot(
+            previous_shoot, game_board_ai, dimension, next_shoot)
+        next_shoot = ai.check_line(
+            game_board_ai, previous_shoot, next_shoot, dimension)
 
-    if value_win_player_1 == value_to_win:
-        print("AI is a gdmn looser")
-    else:
+    if value_win_ai == value_to_win:
         print("Fck ya player 1")
+    else:
+        print("AI is a gdmn looser")
 
 
 def menu_battleship():
@@ -172,13 +186,12 @@ def menu_battleship():
                             input("Podaj wymiar planszy (5-10): "))
                     except ValueError:
                         print('Wymiar musi być cyfrą')
+                    if new_dimension <= 10:
+                        dimension = new_dimension
+                        board_for_player_1 = []
+                        board_for_player_2 = []
                     else:
-                        if new_dimension <= 10:
-                            dimension = new_dimension
-                            board_for_player_1 = []
-                            board_for_player_2 = []
-                        else:
-                            new_dimension = 0
+                        new_dimension = 0
                 menu_operation = 0
             case 2:
                 if board_for_player_1 == []:
@@ -186,7 +199,6 @@ def menu_battleship():
                     time.sleep(3)
                     menu_operation = 3
                 else:
-                    oponent = 'cpu'
                     board_for_ai = game_board.creat_game_board(dimension)
                     print(board_for_ai)
                     board_for_ai, ai_fleet = ai.random_ship_placment(
@@ -198,6 +210,8 @@ def menu_battleship():
                     menu_operation = int(input("Wybierz opcję: "))
                 except ValueError:
                     pass
+    print("Dziękujemy za grę")
+    exit()
 
 
 main()

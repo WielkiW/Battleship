@@ -123,7 +123,7 @@ def place_ships(board_for_player, dimension):
                 elif is_collision(board_for_player, dimension, coords):
                     if ship['size'] > 1:
                         plecement_direction = input(
-                            "Podaj kierunek statku 2 blockowego: (horizontal/vertical) [H/V]")
+                            "Podaj kierunek statku: (horizontal/vertical) [H/V]")
                         check = ship_direction(
                             plecement_direction, ship_placment, ship, dimension, coords, board_for_player, check)
                     else:
